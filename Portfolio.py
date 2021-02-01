@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from pandas_datareader import data
 import pandas_datareader.data as web
+#from pandas_datareader import data
 import datetime as dt
 
 
@@ -36,8 +36,9 @@ class Share:
         return round(df.loc[date, 'Close'], 2)
 
     def get_data(self,start_date,end_date):
-        self.value = web.DataReader(self.name,'yahoo', start = start_date, end = end_date)
-        self.div   =
+        df = web.DataReader(self.name,'yahoo', start = start_date, end = end_date)
+        self.value = df['close']
+        self.div   = df['divCash']# Figure out how to get dividends from the datareader
 
 
 
