@@ -39,8 +39,6 @@ class Share:
         self.value = df
         self.div   = df_div
 
-
-
 class Strategy:
 
     def __init__(self, equity_distribution, bond_distribution, cash_distribution, threshold):
@@ -59,6 +57,14 @@ class Portfolio:
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
+
+# Create a function to make the initial purchase based on a given portfolio strategy
+# Based on the assumption that one ETF is used for either bonds or equities (amount could be evenly split (or risk weighted) among a series of ETFs or individual stocks)
+    def initial_buy(self,amount, strategy,start_date):
+        eq_amount = amount*(strategy.equity_distribution/100)
+        bnd_amount = amount*(strategy.bond_distribution/100)
+        self.buy(voo,eq_amount,start_date)
+        self.buy(bnd,bnd_amount,start_date)
 
     def buy(self, share, amount, date):
         purchase_price = share.get_value(date)
@@ -95,6 +101,8 @@ class Portfolio:
         output['Value'] = num_shares * np.mean([share.loc[end]['Low'], share.loc[end]['High']])
         output['ROI'] = output['Value'] - initial_value
         return (output)
+
+    def get_divs(self, date):
 
     def get_value(self, date):
         value = self.cash_bal
