@@ -1,22 +1,16 @@
 import pandas as pd
 import numpy as np
 import pandas_datareader.data as web
-#from pandas_datareader import data
+from pandas_datareader import data
 import datetime as dt
 
 
-def calc_value(share, divs, start, end, initial_value):
-    # Take the average of the day's high and low for starting share price
-    num_shares = initial_value/np.mean([share.loc[start]['Low'],share.loc[start]['High']])
-    divs = divs[(divs.index <= pd.to_datetime(end)) & (divs.index >= pd.to_datetime(start))]
-    for date in divs.index:
-        price = np.mean([share.High.loc[date], share.Low.loc[date]])
-        div_value = divs.value.loc[date]
-        num_shares += div_value/price
-    output = {}
-    output['Value'] = num_shares*np.mean([share.loc[end]['Low'],share.loc[end]['High']])
-    output['ROI'] = output['Value']-initial_value
-    return(output)
+# Input the full timeframe
+# In future this should be a user input
+start_date = '2010-01-01'
+
+end_date = '2020-01-01'
+
 
 
 class Share:
@@ -32,13 +26,18 @@ class Share:
 
     def get_value(self, date): # At a given point in time
         # Change this to get the full data range first if empty rather than call the database each time
-        df = web.DataReader(self.name, 'yahoo', start=date, end=date)
-        return round(df.loc[date, 'Close'], 2)
+        if len(self.value) == 0:
+            self.get_data(start_date,end_date)
+        while date not in self.value.index:  # Not all dates will be in the dataframe (trading days only)
+            date = pd.to_datetime(date) + dt.timedelta(days = 1) # Add days to the date until we get the next market day
+        return round(self.value.loc[date, 'Close'], 2)
+
 
     def get_data(self,start_date,end_date):
         df = web.DataReader(self.name,'yahoo', start = start_date, end = end_date)
-        self.value = df['close']
-        self.div   = df['divCash']# Figure out how to get dividends from the datareader
+        df_div = web.DataReader(self.name,'yahoo-dividends', start = start_date, end = end_date)
+        self.value = df
+        self.div   = df_div
 
 
 
@@ -83,6 +82,19 @@ class Portfolio:
         elif share not in self.shares:
             self.shares[share] = shares
         cash_bal += amount
+
+    def calc_value(share, divs, start, end, initial_value):
+        # Take the average of the day's high and low for starting share price
+        num_shares = initial_value / np.mean([share.loc[start]['Low'], share.loc[start]['High']])
+        divs = divs[(divs.index <= pd.to_datetime(end)) & (divs.index >= pd.to_datetime(start))]
+        for date in divs.index:
+            price = np.mean([share.High.loc[date], share.Low.loc[date]])
+            div_value = divs.value.loc[date]
+            num_shares += div_value / price
+        output = {}
+        output['Value'] = num_shares * np.mean([share.loc[end]['Low'], share.loc[end]['High']])
+        output['ROI'] = output['Value'] - initial_value
+        return (output)
 
     def get_value(self, date):
         value = self.cash_bal
