@@ -102,7 +102,11 @@ class Portfolio:
         output['ROI'] = output['Value'] - initial_value
         return (output)
 
-    def get_divs(self, date):
+    def reinvest_divs(self, date):
+        for share in self.shares:
+            if date in share.div.index:
+                div_value = share.div.loc['Date','value']
+                self.buy(share,div_value,date)
 
     def get_value(self, date):
         value = self.cash_bal
