@@ -5,18 +5,12 @@ from pandas_datareader import data
 import datetime as dt
 
 
-# Input the full timeframe
-# In future this should be a user input
-start_date = '2010-01-01'
-
-end_date = '2020-01-01'
-
-
+# Input the full timeframe (from user set start and end dates)
 
 class Share:
 # Build in the functionality to store historical values and dividends
 
-    def __init__(self, name, asset_type):
+    def __init__(self, name, asset_type, start_date, end_date):
         """Initialize attributes."""
         self.name = name
         self.type = asset_type
@@ -100,7 +94,7 @@ class Portfolio:
             self.shares[share] -= shares
         elif share not in self.shares:
             self.shares[share] = shares
-        cash_bal += amount
+        self.cash_bal += amount
 
     def calc_value(share, divs, start, end, initial_value):
         # Take the average of the day's high and low for starting share price
@@ -140,5 +134,5 @@ class Portfolio:
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
-        return(self.asset_values)
+        #return(self.asset_values)
         #print(self.asset_values)
