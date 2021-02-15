@@ -41,7 +41,8 @@ class Share:
 
 class Strategy:
 
-    def __init__(self, equity_distribution, bond_distribution, cash_distribution, threshold):
+    def __init__(self,shares, equity_distribution, bond_distribution, cash_distribution, threshold):
+        self.shares = shares
         self.equity_distribution = equity_distribution # What percent of the portfolio should be equities?
         self.bond_distribution = bond_distribution # What percent of the portfolio is bonds?
         self.cash_distribution = 100 - (equity_distribution + bond_distribution) # How much is cash? (Leftover)
@@ -57,14 +58,26 @@ class Portfolio:
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
+        self.equities = []
+        self.bonds = []
+        for share in self.shares:
+            if self.shares[share] == 'Equity':
+                self.equities.append(share)
+            elif self.shares[share] == 'Bond':
+                self.bonds.append(share)
+
 
 # Create a function to make the initial purchase based on a given portfolio strategy
 # Based on the assumption that one ETF is used for either bonds or equities (amount could be evenly split (or risk weighted) among a series of ETFs or individual stocks)
     def initial_buy(self,amount, strategy,start_date):
         eq_amount = amount*(strategy.equity_distribution/100)
         bnd_amount = amount*(strategy.bond_distribution/100)
-        self.buy(voo,eq_amount,start_date)
-        self.buy(bnd,bnd_amount,start_date)
+        eq_amount2 = eq_amount/len(self.equities)
+        bnd_amount2 = bnd_amount/len(self.bonds)
+        for share in self.equities:
+            self.buy(share,eq_amount2,start_date)
+        for share in self.bonds:
+            self.buy(share,bnd_amount2,start_date)
 
     def buy(self, share, amount, date):
         purchase_price = share.get_value(date)
