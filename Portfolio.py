@@ -42,7 +42,6 @@ class Share:
 class Strategy:
 
     def __init__(self, equity_distribution, bond_distribution, cash_distribution, threshold):
-        self.shares = shares
         self.equity_distribution = equity_distribution # What percent of the portfolio should be equities?
         self.bond_distribution = bond_distribution # What percent of the portfolio is bonds?
         self.cash_distribution = 100 - (equity_distribution + bond_distribution) # How much is cash? (Leftover)
