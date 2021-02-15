@@ -140,4 +140,5 @@ class Portfolio:
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
-        print(self.asset_values)
+        return(self.asset_values)
+        #print(self.asset_values)
