@@ -118,7 +118,7 @@ class Portfolio:
     def reinvest_divs(self, date):
         for share in self.shares:
             if date in share.div.index:
-                div_value = share.div.loc['Date','value']
+                div_value = share.div.loc[date,'value']
                 self.buy(share,div_value,date)
 
     def get_value(self, date):
@@ -140,3 +140,4 @@ class Portfolio:
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
+        print(self.asset_values)
