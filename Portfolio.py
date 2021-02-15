@@ -16,20 +16,22 @@ class Share:
         self.type = asset_type
         self.value = pd.DataFrame() # set this as a blank data frame to be populated once we know the timeframe
         self.div = pd.DataFrame()
+        self.start_date = start_date
+        self.end_date = end_date # Maybe make the start and endd ate optional parameters-default as today and earliest point?
         # self.amount = amount
 
     def get_value(self, date): # At a given point in time
         # Change this to get the full data range first if empty rather than call the database each time
         if len(self.value) == 0:
-            self.get_data(start_date,end_date)
+            self.get_data()
         while date not in self.value.index:  # Not all dates will be in the dataframe (trading days only)
             date = pd.to_datetime(date) + dt.timedelta(days = 1) # Add days to the date until we get the next market day
         return round(self.value.loc[date, 'Close'], 2)
 
 
-    def get_data(self,start_date,end_date):
-        df = web.DataReader(self.name,'yahoo', start = start_date, end = end_date)
-        df_div = web.DataReader(self.name,'yahoo-dividends', start = start_date, end = end_date)
+    def get_data():
+        df = web.DataReader(self.name,'yahoo', start = self.start_date, end = self.end_date)
+        df_div = web.DataReader(self.name,'yahoo-dividends', start = self.start_date, end = self.end_date)
         self.value = df
         self.div   = df_div
 
