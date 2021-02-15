@@ -60,7 +60,7 @@ class Portfolio:
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.equities = []
         self.bonds = []
-        for share in self.shares:
+        for share in self.share_types:
             if self.share_types[share] == 'Equity':
                 self.equities.append(share)
             elif self.share_types[share] == 'Bond':
