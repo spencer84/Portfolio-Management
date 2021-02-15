@@ -53,7 +53,7 @@ class Strategy:
 class Portfolio:
 
     def __init__(self,shares):
-        self.shares = {}
+        self.shares = shares
         self.log = {}
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
