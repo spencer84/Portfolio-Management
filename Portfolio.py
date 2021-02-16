@@ -50,7 +50,7 @@ class Portfolio:
     def __init__(self,shares):
         self.share_types = shares # Dictionary of share
         self.shares = {}
-        self.log = {}
+        self.log = pd.DataFrame(columns=['Share','Action','Date','Amount'])
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
@@ -80,7 +80,8 @@ class Portfolio:
         purchase_price = share.get_value(date)
         shares = amount / purchase_price
         # Record the transaction
-        self.log[len(self.log)] = ['Buy', share, amount, purchase_price, shares, date]
+        new_row = dict(zip(self.log.columns,[share.name,'Buy',date,amount]))
+        self.log.append() = new_row
         # Add the number of shares
         if share in self.shares:
             self.shares[share] += shares
@@ -92,7 +93,8 @@ class Portfolio:
         sell_price = share.get_value(date)
         shares = amount / sell_price
         # Record the transaction
-        self.log[len(self.log)] = ['Sell', share, amount, sell_price, shares, date]
+        new_row = dict(zip(self.log.columns, [share.name, 'Sell', date, amount]))
+        self.log.append() = new_row
         # Add the number of shares
         if share in self.shares:
             self.shares[share] -= shares
@@ -117,6 +119,7 @@ class Portfolio:
         for share in self.shares:
             if date in share.div.index:
                 div_value = share.div.loc[date,'value']
+                self.cash_bal += div_value
                 self.buy(share,div_value,date)
 
     def get_value(self, date):
