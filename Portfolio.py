@@ -70,6 +70,7 @@ class Portfolio:
         bnd_amount = amount*(strategy.bond_distribution/100)
         eq_amount2 = eq_amount/len(self.equities)
         bnd_amount2 = bnd_amount/len(self.bonds)
+        self.cash_bal = amount
         for share in self.equities:
             self.buy(share,eq_amount2,start_date)
         for share in self.bonds:
