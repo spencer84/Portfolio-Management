@@ -143,7 +143,7 @@ class Portfolio:
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
         day_val = dict(zip(self.val_hist.columns,[date,total, eq_val,bond_val]))
-        self.val_hist.append(ignore_index=True)
+        self.val_hist.append(day_val,ignore_index=True)
         # Record the values
         #return(self.asset_values)
         #print(self.asset_values)
