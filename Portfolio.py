@@ -29,7 +29,7 @@ class Share:
         return round(self.value.loc[date, 'Close'], 2)
 
 
-    def get_data():
+    def get_data(self):
         df = web.DataReader(self.name,'yahoo', start = self.start_date, end = self.end_date)
         df_div = web.DataReader(self.name,'yahoo-dividends', start = self.start_date, end = self.end_date)
         self.value = df
@@ -85,6 +85,7 @@ class Portfolio:
             self.shares[share] += shares
         elif share not in self.shares:
             self.shares[share] = shares
+        self.cash_bal -= amount
 
     def sell(self, share, amount, date):
         sell_price = share.get_value(date)
