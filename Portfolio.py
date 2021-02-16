@@ -81,7 +81,7 @@ class Portfolio:
         shares = amount / purchase_price
         # Record the transaction
         new_row = dict(zip(self.log.columns,[share.name,'Buy',date,amount]))
-        self.log.append() = new_row
+        self.log.append(new_row)
         # Add the number of shares
         if share in self.shares:
             self.shares[share] += shares
@@ -94,7 +94,7 @@ class Portfolio:
         shares = amount / sell_price
         # Record the transaction
         new_row = dict(zip(self.log.columns, [share.name, 'Sell', date, amount]))
-        self.log.append() = new_row
+        self.log.append(new_row)
         # Add the number of shares
         if share in self.shares:
             self.shares[share] -= shares
