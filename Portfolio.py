@@ -17,15 +17,22 @@ class Share:
         self.value = pd.DataFrame() # set this as a blank data frame to be populated once we know the timeframe
         self.div = pd.DataFrame()
         self.start_date = start_date
-        self.end_date = end_date # Maybe make the start and endd ate optional parameters-default as today and earliest point?
+        self.end_date = end_date # Maybe make the start and end date optional parameters-default as today and earliest point?
         # self.amount = amount
 
     def get_value(self, date): # At a given point in time
         # Change this to get the full data range first if empty rather than call the database each time
         if len(self.value) == 0:
             self.get_data()
+        counter = 0
         while date not in self.value.index:  # Not all dates will be in the dataframe (trading days only)
-            date = pd.to_datetime(date) + dt.timedelta(days = 1) # Add days to the date until we get the next market day
+            hit_the_end = False # Identify if we have hit the end of the data range
+            if pd.to_datetime(date) >= pd.to_datetime(self.end_date):
+                hit_the_end = True # if we have, then count down until we find a trading date in the range
+                date = pd.to_datetime(date) - dt.timedelta(days=1)
+            elif pd.to_datetime(date) < pd.to_datetime(self.end_date) and hit_the_end ==False:
+                date = pd.to_datetime(date) + dt.timedelta(days=1)  # Add days to the date until we get the next market day
+
         return round(self.value.loc[date, 'Close'], 2)
 
 
@@ -143,7 +150,66 @@ class Portfolio:
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
         day_val = dict(zip(self.val_hist.columns,[date,total, eq_val,bond_val]))
+        print(day_val)
         self.val_hist.append(day_val,ignore_index=True)
         # Record the values
         #return(self.asset_values)
         #print(self.asset_values)
+
+
+# Define start date and end date
+
+start_date = '2015-01-01'
+
+end_date = '2020-01-05'
+
+
+# Define Shares
+
+# Provide the name of the ticker and type (Equity or Bond)
+
+voo = Share('VOO', 'Equity', start_date,end_date)
+bnd = Share('BND', 'Bond', start_date, end_date)
+
+shares_list = [voo, bnd]
+
+shares_dict = {}
+
+for share in shares_list:
+    shares_dict[share] = share.type
+
+# Provide the equity distribution, the bond distriubtion, cash distribution, and the threshold
+strat = Strategy(50,50,0,5)
+
+# Run the portfolio over a series of months
+
+
+portfolio = Portfolio(shares_dict)
+
+portfolio.initial_buy(500, strat, start_date)
+
+time_period = pd.date_range(pd.to_datetime(start_date), pd.to_datetime(end_date))
+
+for day in time_period:
+    print(day)
+    portfolio.reinvest_divs(day)
+    portfolio.get_asset_values(day)
+    print(portfolio.asset_split)
+    if portfolio.asset_split['Equities'] > strat.equity_distribution + strat.threshold:
+        sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
+                    (portfolio.asset_split['Equities'] - strat.equity_distribution) / 100)
+        sell_amt_per = sell_amt / len(portfolio.equities)
+        for share in portfolio.equities:  # sell equities and buy more bonds
+            portfolio.sell(share, sell_amt_per, day)
+        for share in portfolio.bonds:
+            portfolio.buy(share, sell_amt_per, day)
+
+    if portfolio.asset_split['Bonds'] > strat.bond_distribution + strat.threshold:
+        sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
+                    portfolio.asset_split['Bonds'] - strat.bond_distribution)
+        sell_amt_per = sell_amt / len(portfolio.bonds)
+        for share in portfolio.bonds:  # sell bonds and buy more equities
+            portfolio.sell(share, sell_amt_per, day)
+        for share in portfolio.bonds:
+            portfolio.buy(share, sell_amt_per, day)
+
