@@ -50,7 +50,8 @@ class Portfolio:
     def __init__(self,shares):
         self.share_types = shares # Dictionary of share
         self.shares = {}
-        self.log = pd.DataFrame(columns=['Share','Action','Date','Amount'])
+        self.log = pd.DataFrame(columns=['Share','Action','Date','Amount']) # Transactional history
+        self.val_hist = pd.DataFrame(columns =['Date','Total Value', 'Equities','Bonds'])
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
@@ -141,5 +142,8 @@ class Portfolio:
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
+        day_val = dict(zip(self.val_hist.columns,[date,total, eq_val,bond_val]))
+        self.val_hist.append(ignore_index=True)
+        # Record the values
         #return(self.asset_values)
         #print(self.asset_values)
