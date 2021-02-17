@@ -130,7 +130,7 @@ class Portfolio:
     def reinvest_divs(self, date):
         for share in self.shares:
             if date in share.div.index:
-                div_value = share.div.loc[date,'value']
+                div_value = share.div.loc[date,'value']*self.shares[share]
                 self.cash_bal += div_value
                 self.buy(share,div_value,date)
 
@@ -170,57 +170,57 @@ class Portfolio:
 
 # Define start date and end date
 
-start_date = '2015-01-01'
-
-end_date = '2020-01-05'
-
-
-# Define Shares
-
-# Provide the name of the ticker and type (Equity or Bond)
-
-voo = Share('VOO', 'Equity', start_date,end_date)
-bnd = Share('BND', 'Bond', start_date, end_date)
-
-shares_list = [voo, bnd]
-
-shares_dict = {}
-
-for share in shares_list:
-    shares_dict[share] = share.type
-
-# Provide the equity distribution, the bond distriubtion, cash distribution, and the threshold
-strat = Strategy(50,50,0,5)
-
-# Run the portfolio over a series of months
-
-
-portfolio = Portfolio(shares_dict)
-
-portfolio.initial_buy(500, strat, start_date)
-
-time_period = pd.date_range(pd.to_datetime(start_date), pd.to_datetime(end_date))
-
-for day in time_period:
-    print(day)
-    portfolio.reinvest_divs(day)
-    portfolio.get_asset_values(day)
-    #print(portfolio.asset_split)
-    if portfolio.asset_split['Equities'] > strat.equity_distribution + strat.threshold:
-        sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
-                    (portfolio.asset_split['Equities'] - strat.equity_distribution) / 100)
-        sell_amt_per = sell_amt / len(portfolio.equities)
-        for share in portfolio.equities:  # sell equities and buy more bonds
-            portfolio.sell(share, sell_amt_per, day)
-        for share in portfolio.bonds:
-            portfolio.buy(share, sell_amt_per, day)
-
-    if portfolio.asset_split['Bonds'] > strat.bond_distribution + strat.threshold:
-        sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
-                    portfolio.asset_split['Bonds'] - strat.bond_distribution)
-        sell_amt_per = sell_amt / len(portfolio.bonds)
-        for share in portfolio.bonds:  # sell bonds and buy more equities
-            portfolio.sell(share, sell_amt_per, day)
-        for share in portfolio.bonds:
-            portfolio.buy(share, sell_amt_per, day)
-portfolio.get_hist_df()
+# start_date = '2015-01-01'
+#
+# end_date = '2020-01-05'
+#
+#
+# # Define Shares
+#
+# # Provide the name of the ticker and type (Equity or Bond)
+#
+# voo = Share('VOO', 'Equity', start_date,end_date)
+# bnd = Share('BND', 'Bond', start_date, end_date)
+#
+# shares_list = [voo, bnd]
+#
+# shares_dict = {}
+#
+# for share in shares_list:
+#     shares_dict[share] = share.type
+#
+# # Provide the equity distribution, the bond distriubtion, cash distribution, and the threshold
+# strat = Strategy(50,50,0,5)
+#
+# # Run the portfolio over a series of months
+#
+# #
+# # portfolio = Portfolio(shares_dict)
+# #
+# # portfolio.initial_buy(500, strat, start_date)
+# #
+# # time_period = pd.date_range(pd.to_datetime(start_date), pd.to_datetime(end_date))
+# #
+# # for day in time_period:
+# #     print(day)
+# #     portfolio.reinvest_divs(day)
+# #     portfolio.get_asset_values(day)
+# #     #print(portfolio.asset_split)
+# #     if portfolio.asset_split['Equities'] > strat.equity_distribution + strat.threshold:
+#         sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
+#                     (portfolio.asset_split['Equities'] - strat.equity_distribution) / 100)
+#         sell_amt_per = sell_amt / len(portfolio.equities)
+#         for share in portfolio.equities:  # sell equities and buy more bonds
+#             portfolio.sell(share, sell_amt_per, day)
+#         for share in portfolio.bonds:
+#             portfolio.buy(share, sell_amt_per, day)
+#
+#     if portfolio.asset_split['Bonds'] > strat.bond_distribution + strat.threshold:
+#         sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
+#                     portfolio.asset_split['Bonds'] - strat.bond_distribution)
+#         sell_amt_per = sell_amt / len(portfolio.bonds)
+#         for share in portfolio.bonds:  # sell bonds and buy more equities
+#             portfolio.sell(share, sell_amt_per, day)
+#         for share in portfolio.bonds:
+#             portfolio.buy(share, sell_amt_per, day)
+# portfolio.get_hist_df()
