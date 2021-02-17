@@ -24,14 +24,15 @@ class Share:
         # Change this to get the full data range first if empty rather than call the database each time
         if len(self.value) == 0:
             self.get_data()
-        counter = 0
+        hit_the_end = False  # Identify if we have hit the end of the data range
+
         while date not in self.value.index:  # Not all dates will be in the dataframe (trading days only)
-            hit_the_end = False # Identify if we have hit the end of the data range
             if pd.to_datetime(date) >= pd.to_datetime(self.end_date):
                 hit_the_end = True # if we have, then count down until we find a trading date in the range
+            if hit_the_end == True:
                 date = pd.to_datetime(date) - dt.timedelta(days=1)
-            elif pd.to_datetime(date) < pd.to_datetime(self.end_date) and hit_the_end ==False:
-                date = pd.to_datetime(date) + dt.timedelta(days=1)  # Add days to the date until we get the next market day
+            else:
+                date = pd.to_datetime(date) + dt.timedelta(days=1)
 
         return round(self.value.loc[date, 'Close'], 2)
 
@@ -57,8 +58,8 @@ class Portfolio:
     def __init__(self,shares):
         self.share_types = shares # Dictionary of share
         self.shares = {}
-        self.log = pd.DataFrame(columns=['Share','Action','Date','Amount']) # Transactional history
-        self.val_hist = pd.DataFrame(columns =['Date','Total Value', 'Equities','Bonds'])
+        self.log = {'Share':[],'Action':[],'Date':[],'Amount':[]}# Transactional history
+        self.val_hist = {'Date':[],'Total Value':[], 'Equities':[],'Bonds':[]}
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
@@ -88,8 +89,10 @@ class Portfolio:
         purchase_price = share.get_value(date)
         shares = amount / purchase_price
         # Record the transaction
-        new_row = dict(zip(self.log.columns,[share.name,'Buy',date,amount]))
-        self.log.append(new_row, ignore_index=True)
+        self.log['Share'].append(share.name)
+        self.log['Action'].append('Buy')
+        self.log['Date'].append(date)
+        self.log['Amount'].append(amount)
         # Add the number of shares
         if share in self.shares:
             self.shares[share] += shares
@@ -101,9 +104,10 @@ class Portfolio:
         sell_price = share.get_value(date)
         shares = amount / sell_price
         # Record the transaction
-        new_row = dict(zip(self.log.columns, [share.name, 'Sell', date, amount]))
-        self.log.append(new_row, ignore_index=True)
-        # Add the number of shares
+        self.log['Share'].append(share.name)
+        self.log['Action'].append('Sell')
+        self.log['Date'].append(date)
+        self.log['Amount'].append(amount)
         if share in self.shares:
             self.shares[share] -= shares
         elif share not in self.shares:
@@ -149,9 +153,16 @@ class Portfolio:
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
         self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
-        day_val = dict(zip(self.val_hist.columns,[date,total, eq_val,bond_val]))
-        print(day_val)
-        self.val_hist.append(day_val,ignore_index=True)
+        self.val_hist['Date'].append(date)
+        self.val_hist['Total Value'].append(total)
+        self.val_hist['Equities'].append(eq_val)
+        self.val_hist['Bonds'].append(bond_val)
+
+    def get_hist_df(self):
+        return(pd.DataFrame.from_dict(self.val_hist))
+    def get_log(self):
+        return(pd.DataFrame.from_dict(self.log))
+
         # Record the values
         #return(self.asset_values)
         #print(self.asset_values)
@@ -194,7 +205,7 @@ for day in time_period:
     print(day)
     portfolio.reinvest_divs(day)
     portfolio.get_asset_values(day)
-    print(portfolio.asset_split)
+    #print(portfolio.asset_split)
     if portfolio.asset_split['Equities'] > strat.equity_distribution + strat.threshold:
         sell_amt = (portfolio.asset_values['Equities'] + portfolio.asset_values['Bonds']) * (
                     (portfolio.asset_split['Equities'] - strat.equity_distribution) / 100)
@@ -212,4 +223,4 @@ for day in time_period:
             portfolio.sell(share, sell_amt_per, day)
         for share in portfolio.bonds:
             portfolio.buy(share, sell_amt_per, day)
-
+portfolio.get_hist_df()
