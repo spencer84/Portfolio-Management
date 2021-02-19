@@ -18,6 +18,7 @@ class Share:
         self.div = pd.DataFrame()
         self.start_date = start_date
         self.end_date = end_date # Maybe make the start and end date optional parameters-default as today and earliest point?
+        self.rolling_90_days = pd.DataFrame()
         # self.amount = amount
 
     def get_value(self, date): # At a given point in time
@@ -38,10 +39,18 @@ class Share:
 
 
     def get_data(self):
-        df = web.DataReader(self.name,'yahoo', start = self.start_date, end = self.end_date)
+        ninety_days_before = self.start_date - dt.timedelta(days = 90)
+        df = web.DataReader(self.name,'yahoo', ninety_days_before, end = self.end_date)
         df_div = web.DataReader(self.name,'yahoo-dividends', start = self.start_date, end = self.end_date)
         self.value = df
         self.div   = df_div
+
+    def get_rolling(self, date):
+        df = self.value
+        date = pd.to_datetime(date)
+        ninety_days_before = date - dt.timedelta(days = 90)
+        df = df[(df.index <= date) & (df.index > ninety_days_before)]
+        self.rolling_90_days = df
 
 class Strategy:
 
