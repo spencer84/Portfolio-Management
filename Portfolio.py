@@ -74,11 +74,8 @@ class Portfolio:
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.equities = []
         self.bonds = []
-        for share in self.share_types:
-            if self.share_types[share] == 'Equity':
-                self.equities.append(share)
-            elif self.share_types[share] == 'Bond':
-                self.bonds.append(share)
+        self.div_reinvest = True
+        self.bonds.append(share)
 
 
 # Create a function to make the initial purchase based on a given portfolio strategy
@@ -141,7 +138,8 @@ class Portfolio:
             if date in share.div.index:
                 div_value = share.div.loc[date,'value']*self.shares[share]
                 self.cash_bal += div_value
-                self.buy(share,div_value,date)
+                if self.div_reinvest:
+                    self.buy(share,div_value,date)
 
     def get_value(self, date):
         value = self.cash_bal
