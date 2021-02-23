@@ -39,7 +39,7 @@ class Share:
 
 
     def get_data(self):
-        ninety_days_before = self.start_date - dt.timedelta(days = 90)
+        ninety_days_before = pd.to_datetime(self.start_date) - dt.timedelta(days = 90)
         df = web.DataReader(self.name,'yahoo', ninety_days_before, end = self.end_date)
         df_div = web.DataReader(self.name,'yahoo-dividends', start = self.start_date, end = self.end_date)
         self.value = df
@@ -75,7 +75,7 @@ class Portfolio:
         self.equities = []
         self.bonds = []
         self.div_reinvest = True
-        self.bonds.append(share)
+       # self.bonds.append(share)
 
 
 # Create a function to make the initial purchase based on a given portfolio strategy
