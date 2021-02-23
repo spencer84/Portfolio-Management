@@ -83,8 +83,14 @@ class Portfolio:
     def initial_buy(self,amount, strategy,start_date):
         eq_amount = amount*(strategy.equity_distribution/100)
         bnd_amount = amount*(strategy.bond_distribution/100)
-        eq_amount2 = eq_amount/len(self.equities)
-        bnd_amount2 = bnd_amount/len(self.bonds)
+        if len(self.equities) == 0:
+            eq_amount2 = 0
+        else:
+            eq_amount2 = eq_amount / len(self.equities)
+        if len(self.bonds) == 0:
+            bond_amount2 = 0
+        else:
+            bnd_amount2 = bnd_amount / len(self.bonds)
         self.cash_bal = amount
         for share in self.equities:
             self.buy(share,eq_amount2,start_date)
