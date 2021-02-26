@@ -64,7 +64,7 @@ class Strategy:
 
 class Portfolio:
 
-    def __init__(self,shares):
+    def __init__(self,shares, div_reinvest = True):
         self.share_types = shares # Dictionary of share
         self.shares = {}
         self.log = {'Share':[],'Action':[],'Date':[],'Amount':[]}# Transactional history
@@ -74,8 +74,12 @@ class Portfolio:
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.equities = []
         self.bonds = []
-        self.div_reinvest = True
-       # self.bonds.append(share)
+        self.div_reinvest = div_reinvest
+        for share in self.share_types:
+            if self.share_types[share] == 'Equity':
+                self.equities.append(share)
+            elif self.share_types[share] == 'Bond':
+                self.bonds.append(share)
 
 
 # Create a function to make the initial purchase based on a given portfolio strategy
@@ -88,7 +92,7 @@ class Portfolio:
         else:
             eq_amount2 = eq_amount / len(self.equities)
         if len(self.bonds) == 0:
-            bond_amount2 = 0
+            bnd_amount2 = 0
         else:
             bnd_amount2 = bnd_amount / len(self.bonds)
         self.cash_bal = amount
