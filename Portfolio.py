@@ -63,7 +63,6 @@ class Strategy:
 ##  is more than 1 percent higher, then shares need to be sold to balance the portfolio to the desired distribution.
 
 class Portfolio:
-
     def __init__(self,shares, div_reinvest = True):
         self.share_types = shares # Dictionary of share
         self.shares = {}
