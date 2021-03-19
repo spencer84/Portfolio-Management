@@ -1,7 +1,9 @@
 import Portfolio
+import os
 
 
 def create_new_user():
+    # Creates a username to reference a defined portfolio
     file = open("usernames.txt", "r")
     name = input("Username:\n" )
     while name in file.read():
@@ -10,6 +12,11 @@ def create_new_user():
     file = open("usernames.txt", "a")
     file.write("\n"+name)
     file.close()
+    # Add sub-folder to the 'Users' folder
+    try:
+        os.mkdir("Users/"+name)
+    except FileExistsError:
+        print("Directory " , name ,  " already exists")
 
 
 def user_menu():
@@ -52,7 +59,8 @@ while running:
         running = False
     elif response in usernames:
         user = str(response)
-        print("Welcome back " + response + "!")
+        user_dir = str("Users/"+user)
+        print("Welcome back " + user + "!")
         user_menu()
 
 
