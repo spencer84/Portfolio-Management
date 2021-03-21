@@ -8,20 +8,20 @@ import datetime as dt
 # Input the full timeframe (from user set start and end dates)
 
 class Share:
-# Build in the functionality to store historical values and dividends
+    # Build in the functionality to store historical values and dividends
 
     def __init__(self, name, asset_type, start_date, end_date):
         """Initialize attributes."""
         self.name = name
         self.type = asset_type
-        self.value = pd.DataFrame() # set this as a blank data frame to be populated once we know the timeframe
+        self.value = pd.DataFrame()  # set this as a blank data frame to be populated once we know the timeframe
         self.div = pd.DataFrame()
         self.start_date = start_date
-        self.end_date = end_date # Maybe make the start and end date optional parameters-default as today and earliest point?
+        self.end_date = end_date  # Maybe make the start and end date optional parameters-default as today and earliest point?
         self.rolling_90_days = pd.DataFrame()
         # self.amount = amount
 
-    def get_value(self, date): # At a given point in time
+    def get_value(self, date):  # At a given point in time
         # Change this to get the full data range first if empty rather than call the database each time
         if len(self.value) == 0:
             self.get_data()
@@ -29,7 +29,7 @@ class Share:
 
         while date not in self.value.index:  # Not all dates will be in the dataframe (trading days only)
             if pd.to_datetime(date) >= pd.to_datetime(self.end_date):
-                hit_the_end = True # if we have, then count down until we find a trading date in the range
+                hit_the_end = True  # if we have, then count down until we find a trading date in the range
             if hit_the_end == True:
                 date = pd.to_datetime(date) - dt.timedelta(days=1)
             else:
@@ -37,37 +37,39 @@ class Share:
 
         return round(self.value.loc[date, 'Close'], 2)
 
-
     def get_data(self):
-        ninety_days_before = pd.to_datetime(self.start_date) - dt.timedelta(days = 90)
-        df = web.DataReader(self.name,'yahoo', ninety_days_before, end = self.end_date)
-        df_div = web.DataReader(self.name,'yahoo-dividends', start = self.start_date, end = self.end_date)
+        ninety_days_before = pd.to_datetime(self.start_date) - dt.timedelta(days=90)
+        df = web.DataReader(self.name, 'yahoo', ninety_days_before, end=self.end_date)
+        df_div = web.DataReader(self.name, 'yahoo-dividends', start=self.start_date, end=self.end_date)
         self.value = df
-        self.div   = df_div
+        self.div = df_div
 
     def get_rolling(self, date):
         df = self.value
         date = pd.to_datetime(date)
-        ninety_days_before = date - dt.timedelta(days = 90)
+        ninety_days_before = date - dt.timedelta(days=90)
         df = df[(df.index <= date) & (df.index > ninety_days_before)]
         self.rolling_90_days = df
+
 
 class Strategy:
 
     def __init__(self, equity_distribution, bond_distribution, cash_distribution, threshold):
-        self.equity_distribution = equity_distribution # What percent of the portfolio should be equities?
-        self.bond_distribution = bond_distribution # What percent of the portfolio is bonds?
-        self.cash_distribution = 100 - (equity_distribution + bond_distribution) # How much is cash? (Leftover)
-        self.threshold = threshold # At what threshold should shares be sold to balance the distribution?
+        self.equity_distribution = equity_distribution  # What percent of the portfolio should be equities?
+        self.bond_distribution = bond_distribution  # What percent of the portfolio is bonds?
+        self.cash_distribution = 100 - (equity_distribution + bond_distribution)  # How much is cash? (Leftover)
+        self.threshold = threshold  # At what threshold should shares be sold to balance the distribution?
+
+
 # i.e. if a threshold is set to 1, then if the current value of equities (as a percent of the total portfolio)
 ##  is more than 1 percent higher, then shares need to be sold to balance the portfolio to the desired distribution.
 
 class Portfolio:
-    def __init__(self,shares, div_reinvest = True):
-        self.share_types = shares # Dictionary of share
+    def __init__(self, shares, div_reinvest=True):
+        self.share_types = shares  # Dictionary of share
         self.shares = {}
-        self.log = {'Share':[],'Action':[],'Date':[],'Amount':[]}# Transactional history
-        self.val_hist = {'Date':[],'Total Value':[], 'Equities':[],'Bonds':[]}
+        self.log = {'Share': [], 'Action': [], 'Date': [], 'Amount': []}  # Transactional history
+        self.val_hist = {'Date': [], 'Total Value': [], 'Equities': [], 'Bonds': []}
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
         self.asset_values = {'Equities': None, 'Bonds': None, 'Cash': None}
@@ -80,12 +82,11 @@ class Portfolio:
             elif self.share_types[share] == 'Bond':
                 self.bonds.append(share)
 
-
-# Create a function to make the initial purchase based on a given portfolio strategy
-# Based on the assumption that one ETF is used for either bonds or equities (amount could be evenly split (or risk weighted) among a series of ETFs or individual stocks)
-    def initial_buy(self,amount, strategy,start_date):
-        eq_amount = amount*(strategy.equity_distribution/100)
-        bnd_amount = amount*(strategy.bond_distribution/100)
+    # Create a function to make the initial purchase based on a given portfolio strategy
+    # Based on the assumption that one ETF is used for either bonds or equities (amount could be evenly split (or risk weighted) among a series of ETFs or individual stocks)
+    def initial_buy(self, amount, strategy, start_date):
+        eq_amount = amount * (strategy.equity_distribution / 100)
+        bnd_amount = amount * (strategy.bond_distribution / 100)
         if len(self.equities) == 0:
             eq_amount2 = 0
         else:
@@ -96,12 +97,21 @@ class Portfolio:
             bnd_amount2 = bnd_amount / len(self.bonds)
         self.cash_bal = amount
         for share in self.equities:
-            self.buy(share,eq_amount2,start_date)
+            self.buy(share, eq_amount2, start_date)
         for share in self.bonds:
-            self.buy(share,bnd_amount2,start_date)
+            self.buy(share, bnd_amount2, start_date)
 
-    def buy(self, share, amount, date):
-        purchase_price = share.get_value(date)
+    def manual_setup(self, shares):
+        # Shares is a dictionary type object where the stock ticker is the key and the value is a list containing the date and the value
+        for key in shares:
+            # Buy each share so data is logged
+            self.shares
+
+    def buy(self, share, amount, date, value = None):
+        if value is None:
+            purchase_price = share.get_value(date)
+        else:
+            purchase_price = value
         shares = amount / purchase_price
         # Record the transaction
         self.log['Share'].append(share.name)
@@ -115,8 +125,11 @@ class Portfolio:
             self.shares[share] = shares
         self.cash_bal -= amount
 
-    def sell(self, share, amount, date):
-        sell_price = share.get_value(date)
+    def sell(self, share, amount, date, value = None):
+        if value is None:
+            sell_price = share.get_value(date)
+        else:
+            sell_price = value
         shares = amount / sell_price
         # Record the transaction
         self.log['Share'].append(share.name)
@@ -145,10 +158,10 @@ class Portfolio:
     def reinvest_divs(self, date):
         for share in self.shares:
             if date in share.div.index:
-                div_value = share.div.loc[date,'value']*self.shares[share]
+                div_value = share.div.loc[date, 'value'] * self.shares[share]
                 self.cash_bal += div_value
                 if self.div_reinvest:
-                    self.buy(share,div_value,date)
+                    self.buy(share, div_value, date)
 
     def get_value(self, date):
         value = self.cash_bal
@@ -175,14 +188,14 @@ class Portfolio:
         self.val_hist['Bonds'].append(bond_val)
 
     def get_hist_df(self):
-        return(pd.DataFrame.from_dict(self.val_hist))
+        return (pd.DataFrame.from_dict(self.val_hist))
+
     def get_log(self):
-        return(pd.DataFrame.from_dict(self.log))
+        return (pd.DataFrame.from_dict(self.log))
 
         # Record the values
-        #return(self.asset_values)
-        #print(self.asset_values)
-
+        # return(self.asset_values)
+        # print(self.asset_values)
 
 # Define start date and end date
 

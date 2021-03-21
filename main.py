@@ -1,5 +1,7 @@
 import Portfolio
 import os
+import pickle
+from datetime import date
 
 
 def create_new_user():
@@ -25,8 +27,7 @@ def user_menu():
         print("Sorry, don't have that functionality yet")
         user_menu()
     elif response == '2':
-        print("Sorry, don't have that functionality yet")
-        user_menu()
+        manage_portfolio()
     elif response == '3':
         print("Returning to main menu...")
     elif response == '4':
@@ -43,8 +44,37 @@ def user_menu():
         else:
             user_menu()
 
+# Create a sub-menu for analyzing the portfolio
 
+# Create a sub-menu for managing the portfolio
+def manage_portfolio():
+    # Retrieve the portfolio object / identify if one exists
+    try:
+        portfolio = pickle.load(open(user_dir+'/portfolio', 'rb'))
+    except (FileNotFoundError,EOFError):
+        proceed = input('No portfolio exists for this user--create one? y/n')
+        if proceed == 'y':
+            portfolio = Portfolio.Portfolio(shares={})
+            pickle.dump(portfolio,open(user_dir+'/portfolio', 'wb'))
+    # Set up a sub-menu for management options
+    # Pull up a view of the current distribution
+    response = input("1) View Current Allocations \n2) Define Portfolio \n3) Add Transaction")
+    if response == '1':
+        portfolio.get_asset_values(date=date.today())
+        print(portfolio.asset_values)
+    elif response == '2':
+        keep_adding = True
+        shares = {}
+        while keep_adding:
+            stock = input("Add stock ticker:")
+            date = input("Add date (mm/dd/yyyy):")
+            value = input("Add value:")
+            shares[stock] = [date, value]
+            exit = input("Add another stock? y/n")
+            if exit == 'n':
+                # Overwrite the portfolio with the new allocations
 
+                break
 
 if __name__ == "__main__":
     running = True
