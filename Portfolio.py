@@ -10,14 +10,14 @@ import datetime as dt
 class Share:
     # Build in the functionality to store historical values and dividends
 
-    def __init__(self, name, asset_type, start_date, end_date):
+    def __init__(self, name, asset_type = None, start_date = dt.datetime.now() - dt.timedelta(days = 365), end_date = dt.datetime.now()):
         """Initialize attributes."""
         self.name = name
         self.type = asset_type
         self.value = pd.DataFrame()  # set this as a blank data frame to be populated once we know the timeframe
         self.div = pd.DataFrame()
         self.start_date = start_date
-        self.end_date = end_date  # Maybe make the start and end date optional parameters-default as today and earliest point?
+        self.end_date = end_date  # Maybe make the start and end date optional parameters-default as today and one year ago?
         self.rolling_90_days = pd.DataFrame()
         # self.amount = amount
 
@@ -101,18 +101,27 @@ class Portfolio:
         for share in self.bonds:
             self.buy(share, bnd_amount2, start_date)
 
-    def manual_setup(self, shares):
-        # Shares is a dictionary type object where the stock ticker is the key and the value is a list containing the date and the value
-        for key in shares:
+    def manual_setup(self, shares_input):
+        # shares_input is a dictionary type object where the stock ticker is the key and the value is a list containing the date, the number of shares, and the total amount
+        for share in shares_input:
             # Buy each share so data is logged
-            self.shares
+            amount = float(shares_input[share][2])
+            volume_shares = float(shares_input[share][1]) # get the number of shares
+            date = shares_input[share][0] # Need to convert this to datetime
+            date = dt.datetime.strptime(date, '%m/%d/%Y')
+            share = Share(share) # Convert to share object
+            self.shares[share] = volume_shares # get amount of shares
+            self.buy(share,amount,date,volume_shares = volume_shares, price = amount/volume_shares)
 
-    def buy(self, share, amount, date, value = None):
-        if value is None:
+    def buy(self, share, amount, date, volume_shares = None, price = None):
+        if price is None:
             purchase_price = share.get_value(date)
         else:
-            purchase_price = value
-        shares = amount / purchase_price
+            purchase_price = price
+        if volume_shares is None:
+            shares = amount / purchase_price
+        else:
+            shares = volume_shares
         # Record the transaction
         self.log['Share'].append(share.name)
         self.log['Action'].append('Buy')
@@ -125,12 +134,15 @@ class Portfolio:
             self.shares[share] = shares
         self.cash_bal -= amount
 
-    def sell(self, share, amount, date, value = None):
+    def sell(self, share, amount, date,volume_shares = None, value = None):
         if value is None:
             sell_price = share.get_value(date)
         else:
             sell_price = value
-        shares = amount / sell_price
+        if volume_shares is None:
+            shares = amount / sell_price
+        else:
+            shares = volume_shares
         # Record the transaction
         self.log['Share'].append(share.name)
         self.log['Action'].append('Sell')
@@ -180,7 +192,8 @@ class Portfolio:
                 eq_val += share.get_value(date) * self.shares[share]
         total = bond_val + eq_val + self.cash_bal
         self.asset_values = {'Equities': eq_val, 'Bonds': bond_val, 'Cash': self.cash_bal}
-        self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
+        if total > 0:
+            self.asset_split = {'Equities': (eq_val / total) * 100, 'Bonds': (bond_val / total) * 100,
                             'Cash': (self.cash_bal / total) * 100}
         self.val_hist['Date'].append(date)
         self.val_hist['Total Value'].append(total)

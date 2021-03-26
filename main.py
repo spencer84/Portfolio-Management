@@ -1,7 +1,8 @@
 import Portfolio
 import os
 import pickle
-from datetime import date
+import datetime as dt
+
 
 
 def create_new_user():
@@ -58,20 +59,25 @@ def manage_portfolio():
             pickle.dump(portfolio,open(user_dir+'/portfolio', 'wb'))
     # Set up a sub-menu for management options
     # Pull up a view of the current distribution
-    response = input("1) View Current Allocations \n2) Define Portfolio \n3) Add Transaction")
+    response = input("1) View Current Allocations \n2) Initialize Portfolio \n3) Add/Edit Transactions")
     if response == '1':
-        portfolio.get_asset_values(date=date.today())
+        portfolio.get_asset_values(date=dt.date.today())
         print(portfolio.asset_values)
+        # Get a breakdown of all assets, rather than just an equity/bond allocation
+        manage_portfolio() # Return to previous menu
     elif response == '2':
         keep_adding = True
         shares = {}
         while keep_adding:
             stock = input("Add stock ticker:")
             date = input("Add date (mm/dd/yyyy):")
-            value = input("Add value:")
-            shares[stock] = [date, value]
+            volume_shares = input("Add number of shares:")
+            amount = input("Total value:")
+            shares[stock] = [date, volume_shares, amount]
             exit = input("Add another stock? y/n")
             if exit == 'n':
+                portfolio.manual_setup(shares)
+                pickle.dump(portfolio, open(user_dir + '/portfolio', 'wb'))
                 # Overwrite the portfolio with the new allocations
 
                 break
