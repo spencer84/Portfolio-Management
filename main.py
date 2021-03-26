@@ -61,7 +61,8 @@ def manage_portfolio():
     # Pull up a view of the current distribution
     response = input("1) View Current Allocations \n2) Initialize Portfolio \n3) Add/Edit Transactions")
     if response == '1':
-        portfolio.get_asset_values(date=dt.date.today())
+
+        portfolio.get_value(date=dt.date.today(), indiv_print=True)
         print(portfolio.asset_values)
         # Get a breakdown of all assets, rather than just an equity/bond allocation
         manage_portfolio() # Return to previous menu

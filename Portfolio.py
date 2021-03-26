@@ -102,7 +102,8 @@ class Portfolio:
             self.buy(share, bnd_amount2, start_date)
 
     def manual_setup(self, shares_input):
-        # shares_input is a dictionary type object where the stock ticker is the key and the value is a list containing the date, the number of shares, and the total amount
+        # shares_input is a dictionary type object where the stock ticker is the key and the value is a list containing the date, the number of shares, and the total amount.
+        self.shares = {} # Overwrite any previous shares in file; The point of this function is to initialize a new portfolio.
         for share in shares_input:
             # Buy each share so data is logged
             amount = float(shares_input[share][2])
@@ -111,6 +112,7 @@ class Portfolio:
             date = dt.datetime.strptime(date, '%m/%d/%Y')
             share = Share(share) # Convert to share object
             self.shares[share] = volume_shares # get amount of shares
+            self.cash_bal += amount
             self.buy(share,amount,date,volume_shares = volume_shares, price = amount/volume_shares)
 
     def buy(self, share, amount, date, volume_shares = None, price = None):
@@ -175,11 +177,17 @@ class Portfolio:
                 if self.div_reinvest:
                     self.buy(share, div_value, date)
 
-    def get_value(self, date):
+    def get_value(self, date, indiv_print = False):
+
         value = self.cash_bal
+        print(f"Cash: {value}")
         # Iterate through the 'shares' attribute and get the current value for each 'Share' object
         for share in self.shares:
-            value += share.get_value(date) * self.shares[share]
+            share_val = share.get_value(date) * self.shares[share]
+            value += share_val
+            if indiv_print:
+                print(f"{share.name}: ${share_val}")
+        print(f"Total: {value}")
         return (value)
 
     def get_asset_values(self, date):
