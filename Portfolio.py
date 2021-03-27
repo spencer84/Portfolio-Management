@@ -129,13 +129,13 @@ class Portfolio:
         self.log['Share'].append(share.name)
         self.log['Action'].append('Buy')
         self.log['Date'].append(date)
-        self.log['Amount'].append(amount)
+        self.log['Amount'].append(float(amount))
         # Add the number of shares
         if share in self.shares:
             self.shares[share] += shares
         elif share not in self.shares:
             self.shares[share] = shares
-        self.cash_bal -= amount
+        self.cash_bal -= float(amount)
 
     def sell(self, share, amount, date,volume_shares = None, value = None):
         if value is None:
@@ -150,12 +150,12 @@ class Portfolio:
         self.log['Share'].append(share.name)
         self.log['Action'].append('Sell')
         self.log['Date'].append(date)
-        self.log['Amount'].append(amount)
+        self.log['Amount'].append(float(amount))
         if share in self.shares:
             self.shares[share] -= shares
         elif share not in self.shares:
             self.shares[share] = shares
-        self.cash_bal += amount
+        self.cash_bal += float(amount)
 
     def calc_value(share, divs, start, end, initial_value):
         # Take the average of the day's high and low for starting share price

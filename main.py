@@ -87,6 +87,35 @@ def manage_portfolio():
                 # Overwrite the portfolio with the new allocations
                 break
         manage_portfolio()
+    elif response == '3':
+        response = input("1) Buy  \n2) Sell  \n3) Remove Transaction")
+        if response == '1':
+            keep_adding = True
+            while keep_adding:
+                stock = input("Add stock ticker:")
+                date = input("Add date (mm/dd/yyyy):")
+                volume_shares = input("Add number of shares:")
+                amount = input("Total value:")
+                share = Portfolio.Share(stock)
+                portfolio.buy(share,amount, date, volume_shares)
+                exit = input("Buy another stock? y/n")
+                if exit == 'n':
+                    break
+            manage_portfolio()
+        elif response == '2':
+            keep_adding = True
+            while keep_adding:
+                stock = input("Add stock ticker:")
+                date = input("Add date (mm/dd/yyyy):")
+                volume_shares = input("Add number of shares:")
+                amount = input("Total value:")
+                share = Portfolio.Share(stock)
+                portfolio.sell(share, amount, date, volume_shares)
+                exit = input("Sell another stock? y/n")
+                if exit == 'n':
+                    break
+            manage_portfolio()
+
 if __name__ == "__main__":
     running = True
 while running:
