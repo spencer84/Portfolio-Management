@@ -1,5 +1,6 @@
 import Portfolio
 import os
+import shutil
 import pickle
 import datetime as dt
 
@@ -8,13 +9,18 @@ import datetime as dt
 def create_new_user():
     # Creates a username to reference a defined portfolio
     file = open("usernames.txt", "r")
+    open_file = file.read()
+    file.close()
     name = input("Username:\n" )
-    while name in file.read():
+    while name in open_file:
         print("Username already taken! Try again.")
         name = input("Username:\n")
-    file = open("usernames.txt", "a")
-    file.write("\n"+name)
-    file.close()
+    new_file = open("usernames.txt", "w")
+    for line in open_file:
+        if line != None:
+            new_file.write(line)
+    new_file.write("\n"+name)
+    new_file.close()
     # Add sub-folder to the 'Users' folder
     try:
         os.mkdir("Users/"+name)
@@ -42,6 +48,7 @@ def user_menu():
                     if not line.startswith(user):
                         new_file.write(line)
             new_file.close()
+            shutil.rmtree(user_dir) # Remove the username folder and all associated files
         else:
             user_menu()
 
@@ -62,9 +69,7 @@ def manage_portfolio():
     response = input("1) View Current Allocations \n2) Initialize Portfolio \n3) Add/Edit Transactions")
     if response == '1':
 
-        portfolio.get_value(date=dt.date.today(), indiv_print=True)
-        print(portfolio.asset_values)
-        # Get a breakdown of all assets, rather than just an equity/bond allocation
+        portfolio.get_value(date=dt.date.today(), indiv_print=True) # Returns value by share, total cash, and current total value
         manage_portfolio() # Return to previous menu
     elif response == '2':
         keep_adding = True
@@ -80,16 +85,15 @@ def manage_portfolio():
                 portfolio.manual_setup(shares)
                 pickle.dump(portfolio, open(user_dir + '/portfolio', 'wb'))
                 # Overwrite the portfolio with the new allocations
-
                 break
-
+        manage_portfolio()
 if __name__ == "__main__":
     running = True
 while running:
     file = open("usernames.txt", "r")
     usernames = file.read()
     file.close()
-    response = input("Select User: \n" + usernames + "\n Or: \n  1) Create New User \n 2) Exit \n")
+    response = input("Select User: " + usernames + "\n Or: \n  1) Create New User \n 2) Exit \n")
     if response == '1':
         create_new_user()
     elif response == '2':

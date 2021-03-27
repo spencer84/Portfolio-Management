@@ -104,6 +104,7 @@ class Portfolio:
     def manual_setup(self, shares_input):
         # shares_input is a dictionary type object where the stock ticker is the key and the value is a list containing the date, the number of shares, and the total amount.
         self.shares = {} # Overwrite any previous shares in file; The point of this function is to initialize a new portfolio.
+        self.cash_bal = 0 # Overwrite previous values
         for share in shares_input:
             # Buy each share so data is logged
             amount = float(shares_input[share][2])
@@ -111,7 +112,7 @@ class Portfolio:
             date = shares_input[share][0] # Need to convert this to datetime
             date = dt.datetime.strptime(date, '%m/%d/%Y')
             share = Share(share) # Convert to share object
-            self.shares[share] = volume_shares # get amount of shares
+            #self.shares[share] = volume_shares # get amount of shares
             self.cash_bal += amount
             self.buy(share,amount,date,volume_shares = volume_shares, price = amount/volume_shares)
 
@@ -187,7 +188,7 @@ class Portfolio:
             value += share_val
             if indiv_print:
                 print(f"{share.name}: ${share_val}")
-        print(f"Total: {value}")
+        print(f"Total: ${value}")
         return (value)
 
     def get_asset_values(self, date):
