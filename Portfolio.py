@@ -68,7 +68,7 @@ class Portfolio:
     def __init__(self, shares, div_reinvest=True):
         self.share_types = shares  # Dictionary of share
         self.shares = {}
-        self.log = {'Share': [], 'Action': [], 'Date': [], 'Amount': []}  # Transactional history
+        self.log = {'Share': [], 'Action': [], 'Date': [], 'Amount': [], 'Volume': [], 'Price per Share': []}  # Transactional history
         self.val_hist = {'Date': [], 'Total Value': [], 'Equities': [], 'Bonds': []}
         self.cash_bal = 0
         self.asset_split = {'Equities': None, 'Bonds': None, 'Cash': None}
@@ -129,8 +129,9 @@ class Portfolio:
         self.log['Share'].append(share.name)
         self.log['Action'].append('Buy')
         self.log['Date'].append(date)
-        self.log['Amount'].append(float(amount))
-        # Add the number of shares
+        self.log['Value'].append(float(amount))
+        self.log['Volume'].append(float(volume_shares))
+        self.log['Price per Share'].append(float(purchase_price))
         if share in self.shares:
             self.shares[share] += shares
         elif share not in self.shares:
@@ -151,6 +152,8 @@ class Portfolio:
         self.log['Action'].append('Sell')
         self.log['Date'].append(date)
         self.log['Amount'].append(float(amount))
+        self.log['Volume'].append(float(volume_shares))
+        self.log['Price per Share'].append(float(sell_price))
         if share in self.shares:
             self.shares[share] -= shares
         elif share not in self.shares:

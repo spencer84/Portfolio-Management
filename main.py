@@ -88,7 +88,7 @@ def manage_portfolio():
                 break
         manage_portfolio()
     elif response == '3':
-        response = input("1) Buy  \n2) Sell  \n3) Remove Transaction")
+        response = input("1) Buy  \n2) Sell  \n3) Remove Transaction \n 4) Exit")
         if response == '1':
             keep_adding = True
             while keep_adding:
@@ -114,6 +114,41 @@ def manage_portfolio():
                 exit = input("Sell another stock? y/n")
                 if exit == 'n':
                     break
+        elif response == '3':
+            keep_adding = True
+            while keep_adding:
+                log = portfolio.get_log()
+                print(log)
+                #Need to work out a way to remove a transaction from the log and adjust portfolio as neccesary
+                # For example, if we wanted to remove the sale of a stock we would need to remove that entry in to the log
+                # and then we would need to add back the amount of stock to the portfolio at the price/volume it was sold for.
+                remove = input('Select transaction # to remove/edit or press x to return to previous menu')
+                if remove is int:
+                    transaction_to_remove = log[int(remove)] # Select the transaction by its index from the full dataframe
+                    print(transaction_to_remove)
+                    confirm = input('1) Remove? 2) Exit')
+                    if confirm == '1':
+                        share_name = transaction_to_remove['Share']
+                        share_vol = transaction_to_remove[]
+                        portfolio.shares[]
+                        portfolio.log = log.drop(remove).reset_index() # Remove the selected transaction from the dataframe and reset the index
+                        # Undo the transaction
+                        exit = input("Remove another transaction? y/n")
+                        if exit == 'n':
+                            break
+                    elif confirm == '2'
+                        break
+
+
+                    confirm = input('Are you sure you want to remove the transaction'`)
+
+                        #add code to remove a sale
+                elif remove == 'x':
+                    break
+                else:
+                    'Command not recognized'
+
+        elif response == '4':
             manage_portfolio()
 
 if __name__ == "__main__":
