@@ -94,12 +94,15 @@ def manage_portfolio():
             while keep_adding:
                 stock = input("Add stock ticker:")
                 date = input("Add date (mm/dd/yyyy):")
-                volume_shares = input("Add number of shares:")
-                amount = input("Total value:")
-                share = Portfolio.Share(stock)
+                volume_shares = float(input("Add number of shares:"))
+                amount = float(input("Total value:"))
+                portfolio.get_share_name_dict()
+                share = portfolio.share_names[stock]
+                portfolio.cash_bal += amount
                 portfolio.buy(share,amount, date, volume_shares)
                 exit = input("Buy another stock? y/n")
                 if exit == 'n':
+                    pickle.dump(portfolio, open(user_dir + '/portfolio', 'wb'))
                     break
             manage_portfolio()
         elif response == '2':
@@ -107,12 +110,15 @@ def manage_portfolio():
             while keep_adding:
                 stock = input("Add stock ticker:")
                 date = input("Add date (mm/dd/yyyy):")
-                volume_shares = input("Add number of shares:")
-                amount = input("Total value:")
-                share = Portfolio.Share(stock)
+                volume_shares = float(input("Add number of shares:"))
+                amount = float(input("Total value:"))
+                portfolio.get_share_name_dict()
+                share = portfolio.share_names[stock]
+                portfolio.cash_bal += amount
                 portfolio.sell(share, amount, date, volume_shares)
                 exit = input("Sell another stock? y/n")
                 if exit == 'n':
+                    pickle.dump(portfolio, open(user_dir + '/portfolio', 'wb'))
                     break
         elif response == '3':
             keep_adding = True
@@ -131,18 +137,21 @@ def manage_portfolio():
                     if confirm == '1':
                         share = transaction_to_remove['Share']
                         share = portfolio.share_names[share] # Looks up the share name to the correct share object in the portfolio
-                        share_vol = transaction_to_remove['Volume']
-                        amount = transaction_to_remove['Amount']
+                        share_vol = float(transaction_to_remove['Volume'])
+                        amount = float(transaction_to_remove['Amount'])
                         if transaction_to_remove['Action'] == 'Buy':
                             portfolio.shares[share] -= share_vol
                             portfolio.cash_bal += amount
                         elif transaction_to_remove['Action'] == 'Sell':
                             portfolio.shares[share] += share_vol
                             portfolio.cash_bal -= amount
-                        portfolio.log = log.drop(remove).reset_index() # Remove the selected transaction from the dataframe and reset the index
+                        for key in portfolio.log:
+                            portfolio.log[key] = portfolio.log[key].pop(int(remove))
+                        #portfolio.log = log.drop(int(remove)).reset_index() # Remove the selected transaction from the dataframe and reset the index
                         # Undo the transaction
                         exit = input("Remove another transaction? y/n")
                         if exit == 'n':
+                            pickle.dump(portfolio, open(user_dir + '/portfolio', 'wb'))
                             break
                     elif confirm == '2':
                         break

@@ -220,6 +220,7 @@ class Portfolio:
         return (pd.DataFrame.from_dict(self.log))
 
     def get_share_name_dict(self):
+        self.share_names = {}
         for share in self.shares:
             self.share_names[share.name] = share
 
