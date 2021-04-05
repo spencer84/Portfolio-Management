@@ -123,9 +123,7 @@ class Portfolio:
         else:
             purchase_price = price
         if volume_shares is None:
-            shares = amount / purchase_price
-        else:
-            shares = volume_shares
+            volume_shares = amount / purchase_price
         # Record the transaction
         self.log['Share'].append(share.name)
         self.log['Action'].append('Buy')
@@ -134,9 +132,9 @@ class Portfolio:
         self.log['Volume'].append(float(volume_shares))
         self.log['Price per Share'].append(float(purchase_price))
         if share in self.shares:
-            self.shares[share] += shares
+            self.shares[share] += volume_shares
         elif share not in self.shares:
-            self.shares[share] = shares
+            self.shares[share] = volume_shares
         self.cash_bal -= float(amount)
 
     def sell(self, share, amount, date,volume_shares = None, value = None):
