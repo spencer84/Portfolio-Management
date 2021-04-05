@@ -123,24 +123,32 @@ def manage_portfolio():
                 # For example, if we wanted to remove the sale of a stock we would need to remove that entry in to the log
                 # and then we would need to add back the amount of stock to the portfolio at the price/volume it was sold for.
                 remove = input('Select transaction # to remove/edit or press x to return to previous menu')
-                if remove is int:
-                    transaction_to_remove = log[int(remove)] # Select the transaction by its index from the full dataframe
+                if int(remove) in log.index:
+                    transaction_to_remove = log.iloc[int(remove)] # Select the transaction by its index from the full dataframe
                     print(transaction_to_remove)
+                    portfolio.get_share_name_dict() # Create the dictionary of share names to share objects
                     confirm = input('1) Remove? 2) Exit')
                     if confirm == '1':
-                        share_name = transaction_to_remove['Share']
-                        share_vol = transaction_to_remove[]
-                        portfolio.shares[]
+                        share = transaction_to_remove['Share']
+                        share = portfolio.share_names[share] # Looks up the share name to the correct share object in the portfolio
+                        share_vol = transaction_to_remove['Volume']
+                        amount = transaction_to_remove['Amount']
+                        if transaction_to_remove['Action'] == 'Buy':
+                            portfolio.shares[share] -= share_vol
+                            portfolio.cash_bal += amount
+                        elif transaction_to_remove['Action'] == 'Sell':
+                            portfolio.shares[share] += share_vol
+                            portfolio.cash_bal -= amount
                         portfolio.log = log.drop(remove).reset_index() # Remove the selected transaction from the dataframe and reset the index
                         # Undo the transaction
                         exit = input("Remove another transaction? y/n")
                         if exit == 'n':
                             break
-                    elif confirm == '2'
+                    elif confirm == '2':
                         break
 
 
-                    confirm = input('Are you sure you want to remove the transaction'`)
+                    confirm = input('Are you sure you want to remove the transaction')
 
                         #add code to remove a sale
                 elif remove == 'x':

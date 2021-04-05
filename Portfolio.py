@@ -68,6 +68,7 @@ class Portfolio:
     def __init__(self, shares, div_reinvest=True):
         self.share_types = shares  # Dictionary of share
         self.shares = {}
+        self.share_names = {}
         self.log = {'Share': [], 'Action': [], 'Date': [], 'Amount': [], 'Volume': [], 'Price per Share': []}  # Transactional history
         self.val_hist = {'Date': [], 'Total Value': [], 'Equities': [], 'Bonds': []}
         self.cash_bal = 0
@@ -129,7 +130,7 @@ class Portfolio:
         self.log['Share'].append(share.name)
         self.log['Action'].append('Buy')
         self.log['Date'].append(date)
-        self.log['Value'].append(float(amount))
+        self.log['Amount'].append(float(amount))
         self.log['Volume'].append(float(volume_shares))
         self.log['Price per Share'].append(float(purchase_price))
         if share in self.shares:
@@ -217,6 +218,10 @@ class Portfolio:
 
     def get_log(self):
         return (pd.DataFrame.from_dict(self.log))
+
+    def get_share_name_dict(self):
+        for share in self.shares:
+            self.share_names[share.name] = share
 
         # Record the values
         # return(self.asset_values)
