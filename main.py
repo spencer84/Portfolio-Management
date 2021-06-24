@@ -66,12 +66,14 @@ def manage_portfolio():
             pickle.dump(portfolio,open(user_dir+'/portfolio', 'wb'))
     # Set up a sub-menu for management options
     # Pull up a view of the current distribution
-    response = input("1) View Current Allocations \n2) Initialize Portfolio \n3) Add/Edit Transactions")
+    response = input("1) View Current Allocations \n3) Initialize Portfolio \n4) Add/Edit Transactions")
     if response == '1':
 
         portfolio.get_value(date=dt.date.today(), indiv_print=True) # Returns value by share, total cash, and current total value
         manage_portfolio() # Return to previous menu
     elif response == '2':
+        portfolio.get_log()
+    elif response == '3':
         keep_adding = True
         shares = {}
         while keep_adding:
@@ -87,7 +89,7 @@ def manage_portfolio():
                 # Overwrite the portfolio with the new allocations
                 break
         manage_portfolio()
-    elif response == '3':
+    elif response == '4':
         response = input("1) Buy  \n2) Sell  \n3) Remove Transaction \n 4) Exit")
         if response == '1':
             keep_adding = True

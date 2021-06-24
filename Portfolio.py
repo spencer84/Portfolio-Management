@@ -191,7 +191,7 @@ class Portfolio:
             if indiv_print:
                 print(f"{share.name}: ${share_val}")
         print(f"Total: ${value}")
-        return (value)
+        return value
 
     def get_asset_values(self, date):
         bond_val = 0
@@ -215,7 +215,7 @@ class Portfolio:
         return (pd.DataFrame.from_dict(self.val_hist))
 
     def get_log(self):
-        return (pd.DataFrame.from_dict(self.log))
+        return pd.DataFrame.from_dict(self.log)
 
     def get_share_name_dict(self):
         self.share_names = {}
