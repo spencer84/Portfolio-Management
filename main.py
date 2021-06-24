@@ -66,7 +66,7 @@ def manage_portfolio():
             pickle.dump(portfolio,open(user_dir+'/portfolio', 'wb'))
     # Set up a sub-menu for management options
     # Pull up a view of the current distribution
-    response = input("1) View Current Allocations \n3) Initialize Portfolio \n4) Add/Edit Transactions")
+    response = input("1) View Current Allocations \n2 View Transaction Log \n3) Initialize Portfolio \n4) Add/Edit Transactions")
     if response == '1':
 
         portfolio.get_value(date=dt.date.today(), indiv_print=True) # Returns value by share, total cash, and current total value

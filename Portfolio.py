@@ -216,6 +216,7 @@ class Portfolio:
 
     def get_log(self):
         return pd.DataFrame.from_dict(self.log)
+        print('Test')
 
     def get_share_name_dict(self):
         self.share_names = {}
